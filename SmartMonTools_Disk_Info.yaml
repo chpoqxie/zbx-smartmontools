@@ -1,0 +1,559 @@
+zabbix_export:
+  version: '6.4'
+  template_groups:
+    - uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    - uuid: 1e60e26f7de549bf8fdc919f625aa48e
+      template: 'SmartMonTools Disk Info'
+      name: 'SmartMonTools Disk Info'
+      groups:
+        - name: Templates/Modules
+      discovery_rules:
+        - uuid: b1070f47867d4f7bb94e6e0359d4c982
+          name: 'Disk discovery'
+          type: ZABBIX_ACTIVE
+          key: smart.disk.discovery
+          delay: 12h
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#DISK}'
+                value: '{$SMART.DISK.MATCHES}'
+                formulaid: A
+              - macro: '{#DISK}'
+                value: '{$SMART.DISK.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          lifetime: 5d
+          item_prototypes:
+            - uuid: ec75671aa3fd43669213a050e1fcdf0d
+              name: 'SMART {#DISK}: 1.Raw Read Error Rate'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no1[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 1)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: dfe275dc363542b58993a1b7578331d7
+              name: 'SMART {#DISK}: 3.Spin Up Time'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no3[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 3)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 268b4ac16d1e4320bb0d06a8475a3b1f
+              name: 'SMART {#DISK}: 4.Start Stop Count'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no4[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 4)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: db50d8f7d1324d91a9e9bba3fded0fbc
+              name: 'SMART {#DISK}: 5.Reallocated Sector Count'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no5[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 5)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+              trigger_prototypes:
+                - uuid: 2f084eb837f7419eb5ebb28a03462dcb
+                  expression: 'last(/SmartMonTools Disk Info/smart.disk.attr.no5[{#DISK}],#1)>last(/SmartMonTools Disk Info/smart.disk.attr.no5[{#DISK}],#2)'
+                  name: 'Disk [{#DISK}]: Reallocated Sector Count increased'
+                  priority: WARNING
+            - uuid: bb7e73a63e034d36b6e8fac97d7083cc
+              name: 'SMART {#DISK}: 7.Seek Error Rate'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no7[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 7)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: fa39322366ba40d7a630df1ec1f23b67
+              name: 'SMART {#DISK}: 9.Power On Hours'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no9[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 9)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: dbbd358ae5b3461291d13945073eb4a3
+              name: 'SMART {#DISK}: 10.Spin Retry Count'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no10[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 10)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 819cd8df0bf340e9a5e3fbd81660afb4
+              name: 'SMART {#DISK}: 11.Calibration Retry Count'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no11[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 11)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: e9e8a985923a4f70ab9ddda594534f4e
+              name: 'SMART {#DISK}: 12.Power Cycle Count'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no12[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 12)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: a313e978abc84607962656681a1733e1
+              name: 'SMART {#DISK}: 184.End-to-End Error'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no184[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 184)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 42bcf367a0a5401a9b3f3862dfaf4ad4
+              name: 'SMART {#DISK}: 187.Reported Uncorrect'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no187[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 187)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+              trigger_prototypes:
+                - uuid: 2784db2f14f04fadba97d0e79fd3510f
+                  expression: 'last(/SmartMonTools Disk Info/smart.disk.attr.no187[{#DISK}],#1)>last(/SmartMonTools Disk Info/smart.disk.attr.no187[{#DISK}],#2)'
+                  name: 'Disk [{#DISK}]: Reported Uncorrect increased'
+                  priority: WARNING
+            - uuid: de078525ab8c46cca349fb1285f13e83
+              name: 'SMART {#DISK}: 188.Command Timeout'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no188[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 188)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: fcef8506b8b0418fba4331361f6ca786
+              name: 'SMART {#DISK}: 189.High Fly Writes'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no189[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 189)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 6d02628ce5f4465eb825d2f1f74b3372
+              name: 'SMART {#DISK}: 190.Airflow Temperature Cel'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no190[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 190)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 4a36bf7708494160900baa9f7e51ff86
+              name: 'SMART {#DISK}: 191.G-Sense Error Rate'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no191[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 191)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 5477bf3ce420413b9fd44b2253bc2293
+              name: 'SMART {#DISK}: 192.Power-Off Retract Count'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no192[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 192)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 162d0f47c0db4615b5f83dca6fb5d647
+              name: 'SMART {#DISK}: 193.Load Cycle Count'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no193[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 193)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 38ac8d1359824fd3acc362875677c220
+              name: 'SMART {#DISK}: 194.Temperature Celsius'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no194[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 194)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 9f21a45038fc4329bdcf1687544c8698
+              name: 'SMART {#DISK}: 195.Hardware ECC Recovered'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no195[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 195)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: f518384995cb4148b750d77e22c35b04
+              name: 'SMART {#DISK}: 196.Reallocated Event Count'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no196[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 196)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+              trigger_prototypes:
+                - uuid: aeba47bdb5e3433189e49026c9cc3ede
+                  expression: 'last(/SmartMonTools Disk Info/smart.disk.attr.no196[{#DISK}],#1)>last(/SmartMonTools Disk Info/smart.disk.attr.no196[{#DISK}],#2)'
+                  name: 'Disk [{#DISK}]: Reallocated Event Count increased'
+                  priority: WARNING
+            - uuid: 93264a1e7afd4fbaba3f3730dd5f5283
+              name: 'SMART {#DISK}: 197.Current Pending Sector'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no197[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 197)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+              trigger_prototypes:
+                - uuid: 0c08ca4ef8d4426ba8d092adf8beb390
+                  expression: 'last(/SmartMonTools Disk Info/smart.disk.attr.no197[{#DISK}],#1)>last(/SmartMonTools Disk Info/smart.disk.attr.no197[{#DISK}],#2)'
+                  name: 'Disk [{#DISK}]: Current Pending Sector increased'
+                  priority: WARNING
+            - uuid: c8b8ea52d90c4fde9eceb0f21e77da4a
+              name: 'SMART {#DISK}: 198.Offline Uncorrectable'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no198[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 198)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+              trigger_prototypes:
+                - uuid: bf18e92c721d44099a5006806128114a
+                  expression: 'last(/SmartMonTools Disk Info/smart.disk.attr.no198[{#DISK}],#1)>last(/SmartMonTools Disk Info/smart.disk.attr.no198[{#DISK}],#2)'
+                  name: 'Disk [{#DISK}]: Offline Uncorrectable increased'
+                  priority: WARNING
+            - uuid: 40704553fabb4a1eb562cdf3f525f721
+              name: 'SMART {#DISK}: 199.UDMA CRC Error Count'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no199[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 199)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 4b5f411ac0b1494db436291a4c7fed43
+              name: 'SMART {#DISK}: 200.Multi Zone Error Rate'
+              type: DEPENDENT
+              key: 'smart.disk.attr.no200[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.ata_smart_attributes.table[?(@.id == 200)].raw.value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: cf4e7e0c03a145f8a4fea429f7d7cfa7
+              name: 'SMART {#DISK}: Calculated ''Power on time'''
+              type: DEPENDENT
+              key: 'smart.disk.attr.pot[{#DISK}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.power_on_time.hours
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+            - uuid: 55628819d6a444f1b01bfdbb0f617116
+              name: 'SMART {#DISK}: Calculated ''Temperature'''
+              type: DEPENDENT
+              key: 'smart.disk.attr.temp[{#DISK}]'
+              delay: '0'
+              units: Celsius
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.temperature.current
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.attrs[{#DISK}]'
+              trigger_prototypes:
+                - uuid: d4f8a922fcd4410291d7f6f70e2dfc44
+                  expression: 'last(/SmartMonTools Disk Info/smart.disk.attr.temp[{#DISK}])>{$SMART.TEMPERATURE.MAX.CRIT}'
+                  name: 'Disk [{#DISK}]: temperature is critical'
+                  event_name: 'Disk [{#DISK}]: temperature is critical (over {$SMART.TEMPERATURE.MAX.CRIT}°C)'
+                  priority: AVERAGE
+                - uuid: 88ea0f5166d94641a14a88923d4fdd56
+                  expression: 'last(/SmartMonTools Disk Info/smart.disk.attr.temp[{#DISK}])>{$SMART.TEMPERATURE.MAX.WARN}'
+                  name: 'Disk [{#DISK}]: temperature is too high'
+                  event_name: 'Disk [{#DISK}]: temperature is too high (over {$SMART.TEMPERATURE.MAX.WARN}°C)'
+                  priority: WARNING
+                  dependencies:
+                    - name: 'Disk [{#DISK}]: temperature is critical'
+                      expression: 'last(/SmartMonTools Disk Info/smart.disk.attr.temp[{#DISK}])>{$SMART.TEMPERATURE.MAX.CRIT}'
+            - uuid: fb1f165b42684dd5ae50b8c31f56e6a5
+              name: 'Disk {#DISK}: get SMART attributes'
+              type: ZABBIX_ACTIVE
+              key: 'smart.disk.attrs[{#DISK}]'
+              delay: 1h
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+            - uuid: a560aa3c100b408eae7f42ec9bbc7f6d
+              name: 'Disk {#DISK} firmware'
+              type: DEPENDENT
+              key: 'smart.disk.firmware[{#DISK}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.firmware_version
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.info[{#DISK}]'
+            - uuid: 05e4b7c39f744fb5b8cf0b41a71c017a
+              name: 'SMART {#DISK}: health status check passed'
+              type: DEPENDENT
+              key: 'smart.disk.health.status[{#DISK}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.smart_status.passed
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.health[{#DISK}]'
+              trigger_prototypes:
+                - uuid: d8f3df324f9848e1b273fb1f024829a5
+                  expression: 'last(/SmartMonTools Disk Info/smart.disk.health.status[{#DISK}])<>"true" and length(last(/SmartMonTools Disk Info/smart.disk.health.status[{#DISK}]))>0'
+                  name: 'Disk [{#DISK}]: SMART health status check not passed'
+                  priority: AVERAGE
+            - uuid: 3c238f2b0e8441b6bfe4e955d7ac377d
+              name: 'Disk {#DISK}: get SMART health'
+              type: ZABBIX_ACTIVE
+              key: 'smart.disk.health[{#DISK}]'
+              delay: 30m
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+            - uuid: 484a06fbdb8f4bb0aaa3ae87ef9ad9f7
+              name: 'Disk {#DISK}: get disk info'
+              type: ZABBIX_ACTIVE
+              key: 'smart.disk.info[{#DISK}]'
+              delay: 6h
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+            - uuid: 4c8150fe6ef144229ec21bde044a5a0e
+              name: 'Disk {#DISK} model'
+              type: DEPENDENT
+              key: 'smart.disk.model[{#DISK}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.model_name
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.info[{#DISK}]'
+            - uuid: 1f5643d0e0124de580907fffb95b6900
+              name: 'Disk {#DISK} serial'
+              type: DEPENDENT
+              key: 'smart.disk.serial[{#DISK}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.serial_number
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: 'smart.disk.info[{#DISK}]'
+              trigger_prototypes:
+                - uuid: e970aab1f0224b4ea48180ecb8933f4d
+                  expression: 'last(/SmartMonTools Disk Info/smart.disk.serial[{#DISK}],#1)<>last(/SmartMonTools Disk Info/smart.disk.serial[{#DISK}],#2) and length(last(/SmartMonTools Disk Info/smart.disk.serial[{#DISK}]))>0'
+                  name: 'Disk [{#DISK}] has been replaced'
+                  event_name: 'Disk [{#DISK}] has been replaced (new serial number received)'
+                  priority: INFO
+                  manual_close: 'YES'
+          graph_prototypes:
+            - uuid: 1a88082473c345b3b67d78c992ba260c
+              name: 'Disk {$DISK} temperature'
+              graph_items:
+                - drawtype: BOLD_LINE
+                  color: 1A7C11
+                  calc_fnc: ALL
+                  item:
+                    host: 'SmartMonTools Disk Info'
+                    key: 'smart.disk.attr.temp[{#DISK}]'
+          lld_macro_paths:
+            - lld_macro: '{#DISK}'
+              path: $..name.first()
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.devices
+      macros:
+        - macro: '{$SMART.DISK.MATCHES}'
+          value: '^.*$'
+        - macro: '{$SMART.DISK.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+        - macro: '{$SMART.TEMPERATURE.MAX.CRIT}'
+          value: '65'
+        - macro: '{$SMART.TEMPERATURE.MAX.WARN}'
+          value: '50'
